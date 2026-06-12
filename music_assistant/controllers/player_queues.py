@@ -34,6 +34,7 @@ from music_assistant_models.enums import (
     ProviderFeature,
     QueueOption,
     RepeatMode,
+    PlayerFeature,
 )
 from music_assistant_models.errors import (
     AudioError,
@@ -957,7 +958,7 @@ class PlayerQueuesController(CoreController):
                 index = temp_index
             # At this point index is guaranteed to be int
             queue.index_in_buffer = index
-            queue.flow_mode_stream_log = []
+            _stream_log = []
             target_player = self.mass.players.get_player(queue_id)
             if target_player is None:
                 raise PlayerUnavailableError(f"Player {queue_id} is not available")
@@ -1018,7 +1019,11 @@ class PlayerQueuesController(CoreController):
                 raise MediaNotFoundError("No playable item found to start playback")
 
             # Reset flow_mode - the streams controller will set it if flow mode is used.
-            queue.flow_mode = False
+            queue.flow_mode = false;
+            target_player = self.mass.players.get_player(queue_id)
+            if target_player  and PlayerFeature.ENQUEUE not in target_player.state.supported_features:
+                queue.flow_mode = True
+
             await self.mass.players.play_media(
                 queue_id,
                 await self.player_media_from_queue_item(queue_item),
