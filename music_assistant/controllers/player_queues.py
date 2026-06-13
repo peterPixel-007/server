@@ -1015,7 +1015,7 @@ class PlayerQueuesController(CoreController):
             else:
                 # all attempts to find a playable item failed
                 await self.stop(queue_id)
-                raise MediaNotFoundError("No playable item found to start playback")          
+                raise MediaNotFoundError("No playable item found to start playback")
             #Reset flow_mode taking into account players capabilities - the streams controller will set it if flow mode is used.
             queue.flow_mode = target_player.requires_flow_mode
             await self.mass.players.play_media(
